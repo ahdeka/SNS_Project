@@ -3,6 +3,7 @@ package com.example.sns_project;
 import static android.content.ContentValues.TAG;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -33,6 +34,8 @@ public class SignUpActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
 
         findViewById(R.id.btnSignUp).setOnClickListener(onClickListener);
+        findViewById(R.id.btnBack).setOnClickListener(onClickListener);
+
     }
 
     @Override
@@ -51,6 +54,9 @@ public class SignUpActivity extends AppCompatActivity {
             switch (view.getId()) {
                 case R.id.btnSignUp:
                     signUp();
+                    break;
+                case R.id.btnBack:
+                    startLoginActivity();
                     break;
             }
         }
@@ -72,6 +78,7 @@ public class SignUpActivity extends AppCompatActivity {
 //                                Log.d(TAG, "createUserWithEmail:success");
                                     FirebaseUser user = mAuth.getCurrentUser();
                                     startToast("회원가입이 완료되었습니다.");
+                                    startLoginActivity();
 //                            updateUI(user);
                                 } else {
                                     if (task.getException() != null)
@@ -85,10 +92,16 @@ public class SignUpActivity extends AppCompatActivity {
             } else {
                 startToast("비밀번호가 일치하지 않습니다.");
             }
-        }else{
+        } else {
             startToast("이메일 또는 비밀번호를 입력해주세요.");
         }
 
+    }
+
+    private void startLoginActivity() {
+        Intent intent = new Intent(this, LoginActivity.class);
+        finishAffinity();
+        startActivity(intent);
     }
 
     private void startToast(String msg) {
