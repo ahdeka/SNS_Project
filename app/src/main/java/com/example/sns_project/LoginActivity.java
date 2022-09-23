@@ -22,7 +22,6 @@ public class LoginActivity extends AppCompatActivity {
     private BackKeyHandler backKeyHandler = new BackKeyHandler(this);
 
     private FirebaseAuth mAuth;
-    private final static String TAG = "LoginActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +33,7 @@ public class LoginActivity extends AppCompatActivity {
 
         findViewById(R.id.btnLogin).setOnClickListener(onClickListener);
         findViewById(R.id.btnGoToSignUp).setOnClickListener(onClickListener);
+        findViewById(R.id.btnGoToPasswordReset).setOnClickListener(onClickListener);
     }
 
     @Override
@@ -54,7 +54,10 @@ public class LoginActivity extends AppCompatActivity {
                     login();
                     break;
                 case R.id.btnGoToSignUp:
-                    startSignUpActivity();
+                    startMyActivity(SignUpActivity.class);
+                    break;
+                case R.id.btnGoToPasswordReset:
+                    startMyActivity(PasswordReset.class);
                     break;
             }
         }
@@ -75,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
 //                                updateUI(user);
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 startToast("로그인에 성공했습니다.");
-                                startMainActivity();
+                                startMyActivity(MainActivity.class);
                             } else {
                                 // If sign in fails, display a message to the user.
 //                                Log.w(TAG, "signInWithEmail:failure", task.getException());
@@ -95,14 +98,10 @@ public class LoginActivity extends AppCompatActivity {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
-    private void startMainActivity() {
-        Intent intent = new Intent(this, MainActivity.class);
-        finishAffinity();
-        startActivity(intent);
-    }
-
-    private void startSignUpActivity() {
-        Intent intent = new Intent(this, SignUpActivity.class);
+    private void startMyActivity(Class C) {
+        Intent intent = new Intent(this, C);
+        if (C.equals(MainActivity.class))
+            finishAffinity();
         startActivity(intent);
     }
 
