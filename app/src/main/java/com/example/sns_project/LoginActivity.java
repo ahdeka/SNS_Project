@@ -20,7 +20,6 @@ import com.google.firebase.auth.FirebaseUser;
 public class LoginActivity extends AppCompatActivity {
 
     private BackKeyHandler backKeyHandler = new BackKeyHandler(this);
-
     private FirebaseAuth mAuth;
 
     @Override
@@ -36,15 +35,15 @@ public class LoginActivity extends AppCompatActivity {
         findViewById(R.id.btnGoToPasswordReset).setOnClickListener(onClickListener);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser != null) {
-            currentUser.reload();
-        }
-    }
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        // Check if user is signed in (non-null) and update UI accordingly.
+//        FirebaseUser currentUser = mAuth.getCurrentUser();
+//        if (currentUser != null) {
+//            currentUser.reload();
+//        }
+//    }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override

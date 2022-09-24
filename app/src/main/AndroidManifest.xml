@@ -31,7 +31,7 @@
         <activity android:name=".LoginActivity"/>
         <activity android:name=".SignUpActivity"/>
         <activity android:name=".PasswordReset" />
-        <activity android:name=".MemberInfo"/>
+        <activity android:name=".MemberInit"/>
 
     </application>
 

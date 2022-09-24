@@ -37,7 +37,7 @@
             android:textSize="20dp"
             android:layout_marginBottom="10dp"
             android:ems="10"
-            android:inputType="datetime"/>
+            android:inputType="date"/>
 
         <EditText
             android:id="@+id/etPhone"
@@ -58,7 +58,8 @@
             android:layout_weight="1"
             android:textSize="20dp"
             android:layout_marginBottom="10dp"
-            android:ems="10"/>
+            android:ems="10"
+            android:inputType="textPostalAddress"/>
 
         <Button
             android:id="@+id/btnConfirm"

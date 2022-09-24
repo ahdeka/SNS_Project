@@ -16,7 +16,6 @@ public class BackKeyHandler {
         if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
             backKeyPressedTime = System.currentTimeMillis();
             showGuide();
-            return;
         }
 
         if (System.currentTimeMillis() <= backKeyPressedTime + 2000) {

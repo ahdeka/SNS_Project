@@ -3,11 +3,9 @@ package com.example.sns_project;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
-import android.view.KeyEvent;
+import android.util.Log;
 import android.view.View;
-import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -27,15 +25,18 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.btnLogout).setOnClickListener(onClickListener);
 
+
+
         if (user == null) {
             startMyActivity(LoginActivity.class);
         } else {
             // 회원가입 or 로그인
             for (UserInfo profile : user.getProviderData()) {
                 String name = profile.getDisplayName();
+                Log.e("이름", "ㅁㄴㅇㅁㄴ");
                 if(name != null){
                     if(name.length() == 0)
-                        startMyActivity(MemberInfo.class);
+                        startMyActivity(MemberInit.class);
                 }
             }
         }
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void startMyActivity(Class C) {
         Intent intent = new Intent(this, C);
-        finishAffinity();
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         startActivity(intent);
     }
 
