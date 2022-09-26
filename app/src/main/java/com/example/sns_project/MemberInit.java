@@ -56,19 +56,20 @@ public class MemberInit extends AppCompatActivity {
 
             MemberInfo memberInfo = new MemberInfo(name, birth, phone, address);
 
-            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                    .setDisplayName("Jane Q. User")
-                    .setPhotoUri(Uri.parse("https://example.com/jane-q-user/profile.jpg"))
-                    .build();
-
-            if (user != null) {
-                user.updateProfile(profileUpdates)
-                        .addOnCompleteListener(new OnCompleteListener<Void>() {
+            if(user!=null){
+                db.collection("users").document(user.getUid()).set(memberInfo)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
-                            public void onComplete(@NonNull Task<Void> task) {
-                                if (task.isSuccessful()) {
-                                    startToast("회원정보가 등록됐습니다.");
-                                }
+                            public void onSuccess(Void aVoid) {
+                                startToast("회원정보 등록을 성공하였습니다.");
+                                startMyActivity(MainActivity.class);
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                startToast("회원정보 등록에 실패하였습니다.");
+                                Log.w(TAG, "Error writing document", e);
                             }
                         });
             }
@@ -77,6 +78,13 @@ public class MemberInit extends AppCompatActivity {
             startToast("회원정보를 입력해주세요.");
         }
 
+    }
+
+    private void startMyActivity(Class C) {
+        Intent intent = new Intent(this, C);
+        if (C.equals(MainActivity.class))
+            finishAffinity();
+        startActivity(intent);
     }
 
     private void startToast(String msg) {

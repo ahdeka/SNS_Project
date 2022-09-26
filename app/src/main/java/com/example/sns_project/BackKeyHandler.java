@@ -13,12 +13,10 @@ public class BackKeyHandler {
     }
 
     public void onBackPressed() {
-        if (System.currentTimeMillis() > backKeyPressedTime + 2000) {
-            backKeyPressedTime = System.currentTimeMillis();
+        if (System.currentTimeMillis() - backKeyPressedTime >= 2000) {
             showGuide();
-        }
-
-        if (System.currentTimeMillis() <= backKeyPressedTime + 2000) {
+            backKeyPressedTime = System.currentTimeMillis();
+        } else {
             activity.finish();
             toast.cancel();
         }
