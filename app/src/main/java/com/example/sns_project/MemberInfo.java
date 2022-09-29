@@ -8,12 +8,14 @@ public class MemberInfo {
     private String phone;
     private String birth;
     private String address;
+    private String photoUri;
 
-    public MemberInfo(String name, String phone, String birth, String address){
+    public MemberInfo(String name, String phone, String birth, String address, String photoUri){
         this.name = name;
         this.phone = phone;
         this.birth = birth;
         this.address = address;
+        this.photoUri = photoUri;
     }
 
     public String getName() {
@@ -46,5 +48,13 @@ public class MemberInfo {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getPhotoUri() {
+        return photoUri;
+    }
+
+    public void setPhotoUri(String photoUri) {
+        this.photoUri = photoUri;
     }
 }

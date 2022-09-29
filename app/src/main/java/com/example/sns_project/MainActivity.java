@@ -35,11 +35,11 @@ public class MainActivity extends AppCompatActivity {
         findViewById(R.id.btnLogout).setOnClickListener(onClickListener);
         userName = findViewById(R.id.tvUser);
 
-
         if (user == null) {
             startMyActivity(LoginActivity.class);
         } else {
-            startMyActivity(CameraActivity.class);
+//            startMyActivity(MainActivity.class);
+//            startMyActivity(CameraActivity.class);
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             DocumentReference docRef = db.collection("users").document(user.getUid());
@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
                         if (document != null) {
 
                             if (document.exists()) {
-                                userName.setText(user.toString());
+                                userName.setText(user.getUid());
                                 Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                             } else {
                                 Log.d(TAG, "No such document");
