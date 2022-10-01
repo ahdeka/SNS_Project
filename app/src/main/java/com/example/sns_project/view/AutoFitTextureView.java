@@ -1,4 +1,4 @@
-package com.example.sns_project;
+package com.example.sns_project.view;
 
 /*
  * Copyright 2014 The Android Open Source Project

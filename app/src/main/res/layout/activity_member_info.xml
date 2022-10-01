@@ -1,87 +1,123 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical">
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:textSize="24dp"
-        android:gravity="center"
-        android:textColor="@color/black"
-        android:text="회원정보" />
+    android:orientation="vertical"
+    android:padding="10dp">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="10dp">
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+        <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:textSize="24dp"
+            android:gravity="center"
+            android:textColor="@color/black"
+            android:text="회원정보" />
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="200dp"
-            android:layout_height="200dp"
-            android:layout_gravity="center_horizontal"
-            app:cardCornerRadius="100dp">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/ivProfile"
+            <androidx.cardview.widget.CardView
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center_horizontal"
+                app:cardCornerRadius="100dp">
+
+                <ImageView
+                    android:id="@+id/ivProfile"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    app:srcCompat="@android:mipmap/sym_def_app_icon" />
+            </androidx.cardview.widget.CardView>
+
+            <EditText
+                android:id="@+id/etName"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                app:srcCompat="@android:mipmap/sym_def_app_icon" />
-        </androidx.cardview.widget.CardView>
+                android:layout_height="wrap_content"
+                android:hint="이름"
+                android:layout_weight="1"
+                android:textSize="20dp"
+                android:layout_marginBottom="10dp"
+                android:ems="10"/>
 
-        <EditText
-            android:id="@+id/etName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="이름"
-            android:layout_weight="1"
-            android:textSize="20dp"
-            android:layout_marginBottom="10dp"
-            android:ems="10"/>
+            <EditText
+                android:id="@+id/etBirth"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="생년월일"
+                android:layout_weight="1"
+                android:textSize="20dp"
+                android:layout_marginBottom="10dp"
+                android:ems="10"
+                android:inputType="date"/>
 
-        <EditText
-            android:id="@+id/etBirth"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="생년월일"
-            android:layout_weight="1"
-            android:textSize="20dp"
-            android:layout_marginBottom="10dp"
-            android:ems="10"
-            android:inputType="date"/>
+            <EditText
+                android:id="@+id/etPhone"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="전화번호"
+                android:layout_weight="1"
+                android:textSize="20dp"
+                android:layout_marginBottom="10dp"
+                android:ems="10"
+                android:inputType="phone"/>
 
-        <EditText
-            android:id="@+id/etPhone"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="전화번호"
-            android:layout_weight="1"
-            android:textSize="20dp"
-            android:layout_marginBottom="10dp"
-            android:ems="10"
-            android:inputType="phone"/>
+            <EditText
+                android:id="@+id/etAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="주소"
+                android:layout_weight="1"
+                android:textSize="20dp"
+                android:layout_marginBottom="10dp"
+                android:ems="10"
+                android:inputType="textPostalAddress"/>
 
-        <EditText
-            android:id="@+id/etAddress"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="주소"
-            android:layout_weight="1"
-            android:textSize="20dp"
-            android:layout_marginBottom="10dp"
-            android:ems="10"
-            android:inputType="textPostalAddress"/>
+            <Button
+                android:id="@+id/btnConfirm"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="확인"/>
 
-        <Button
-            android:id="@+id/btnConfirm"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="확인"/>
+        </LinearLayout>
 
     </LinearLayout>
 
-</LinearLayout>
+    <androidx.cardview.widget.CardView
+        android:id="@+id/buttonsCardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:cardCornerRadius="15dp"
+        android:layout_alignParentBottom="true"
+        android:elevation="10dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <Button
+                android:id="@+id/picture"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="촬영"/>
+
+            <Button
+                android:id="@+id/gallery"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="갤러리"/>
+
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</RelativeLayout>

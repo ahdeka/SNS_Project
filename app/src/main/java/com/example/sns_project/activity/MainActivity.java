@@ -1,4 +1,4 @@
-package com.example.sns_project;
+package com.example.sns_project.activity;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,11 +9,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.example.sns_project.BackKeyHandler;
+import com.example.sns_project.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.UserInfo;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         if (user == null) {
             startMyActivity(LoginActivity.class);
         } else {
-//            startMyActivity(MainActivity.class);
+            startMyActivity(MemberInitActivity.class);
 //            startMyActivity(CameraActivity.class);
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -56,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
                             } else {
                                 Log.d(TAG, "No such document");
 
-                                startMyActivity(MemberInit.class);
+                                startMyActivity(MemberInitActivity.class);
                             }
                         }
                     } else {
