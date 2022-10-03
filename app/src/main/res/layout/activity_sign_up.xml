@@ -18,35 +18,54 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:padding="10dp">
-        <EditText
-            android:id="@+id/etEmailAddress"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="이메일"
-            android:layout_weight="1"
-            android:layout_marginBottom="10dp"
-            android:ems="10"
-            android:inputType="textEmailAddress" />
+            android:layout_height="wrap_content">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etEmailAddress"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="email"
+                android:background="#ffffff"
+                android:layout_weight="1"
+                android:layout_marginBottom="10dp"
+                android:ems="10"
+                android:inputType="textEmailAddress" />
 
-        <EditText
-            android:id="@+id/etPassword"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="비밀번호"
-            android:layout_weight="1"
-            android:layout_marginBottom="10dp"
-            android:ems="10"
-            android:inputType="textPassword" />
+        </com.google.android.material.textfield.TextInputLayout>
 
-        <EditText
-            android:id="@+id/etPasswordCheck"
+        <com.google.android.material.textfield.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="비밀번호 확인"
-            android:layout_weight="1"
-            android:layout_marginBottom="10dp"
-            android:ems="10"
-            android:inputType="textPassword" />
+            android:layout_height="wrap_content">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="password"
+                android:background="#ffffff"
+                android:layout_weight="1"
+                android:layout_marginBottom="10dp"
+                android:ems="10"
+                android:inputType="textPassword" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/etPasswordCheck"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="password check"
+                android:background="#ffffff"
+                android:layout_weight="1"
+                android:layout_marginBottom="10dp"
+                android:ems="10"
+                android:inputType="textPassword" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
 
     </LinearLayout>
     <LinearLayout
@@ -55,10 +74,12 @@
         android:orientation="horizontal"
         android:padding="10dp">
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnBack"
-            android:layout_width="100dp"
+            android:layout_width="130dp"
             android:layout_height="wrap_content"
+            android:textColor="#808080"
+            android:textStyle="bold"
             android:text="뒤로"/>
 
         <View
@@ -66,10 +87,13 @@
             android:layout_height="0dp"
             android:layout_weight="1"/>
 
-        <Button
+        <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/btnSignUp"
-            android:layout_width="100dp"
+            android:layout_width="130dp"
             android:layout_height="wrap_content"
+            android:backgroundTint="#0055FF"
+            android:textColor="@color/white"
+            android:textStyle="bold"
             android:text="다음"/>
 
     </LinearLayout>

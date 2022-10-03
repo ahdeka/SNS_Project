@@ -82,35 +82,22 @@ public class MemberInitActivity extends AppCompatActivity {
                     startMyActivity(CameraActivity.class);
                     break;
                 case R.id.gallery:
+
                     if (ContextCompat.checkSelfPermission(
                             MemberInitActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) !=
                             PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(MemberInitActivity.this,
+                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                                1);
+
                         if (ActivityCompat.shouldShowRequestPermissionRationale(MemberInitActivity.this,
                                 Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                            ActivityCompat.requestPermissions(MemberInitActivity.this,
-                                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                    1);
                         } else {
-                            ActivityCompat.requestPermissions(MemberInitActivity.this,
-                                    new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                    1);
-                            startToast("권한을 허용해 주세요");
+                            startToast("권한을 허용해주세요");
                         }
                     } else {
                         startMyActivity(GalleryActivity.class);
                     }
-//                    if (ContextCompat.checkSelfPermission(
-//                            MemberInitActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) ==
-//                            PackageManager.PERMISSION_GRANTED) {
-//                    } else if (ActivityCompat.shouldShowRequestPermissionRationale(MemberInitActivity.this,
-//                            Manifest.permission.READ_EXTERNAL_STORAGE)) {
-//                        ActivityCompat.requestPermissions(MemberInitActivity.this,
-//                                new String[] { Manifest.permission.READ_EXTERNAL_STORAGE },
-//                                1);
-//                } else {
-//                    // You can directly ask for the permission.;
-//                        startMyActivity(GalleryActivity.class);
-//                }
                     break;
             }
         }
@@ -127,7 +114,7 @@ public class MemberInitActivity extends AppCompatActivity {
                         grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     startMyActivity(GalleryActivity.class);
                 } else {
-                    startToast("권한을 허용해 주세요");
+                    startToast("권한을 허용해주세요");
                 }
         }
     }

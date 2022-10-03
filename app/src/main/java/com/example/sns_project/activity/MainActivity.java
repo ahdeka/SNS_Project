@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
         if (user == null) {
             startMyActivity(LoginActivity.class);
         } else {
-            startMyActivity(MemberInitActivity.class);
+//            startMyActivity(MemberInitActivity.class);
 //            startMyActivity(CameraActivity.class);
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();

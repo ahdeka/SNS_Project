@@ -1,18 +1,29 @@
 package com.example.sns_project.adapter;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.sns_project.R;
+
+import java.util.ArrayList;
 
 public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHolder> {
 
-    private String[] localDataSet;
+    private ArrayList<String> localDataSet;
+    private Activity activity;
 
     /**
      * Provide a reference to the type of views that you are using
@@ -41,31 +52,42 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
      * @param dataSet String[] containing the data to populate views to be used
      *                by RecyclerView.
      */
-    public GalleryAdapter(String[] dataSet) {
+    public GalleryAdapter(Activity activity, ArrayList<String> dataSet) {
         localDataSet = dataSet;
+        this.activity = activity;
     }
 
     // Create new views (invoked by the layout manager)
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
         // Create a new view, which defines the UI of the list item
-        CardView view = (CardView) LayoutInflater.from(viewGroup.getContext())
+        CardView cardView = (CardView) LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.item_gallery, viewGroup, false);
 
-
-        return new ViewHolder(view);
+        return new ViewHolder(cardView);
     }
 
     // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, final int position) {
-        TextView textView = viewHolder.cardView.findViewById(R.id.asdTextView);
-        textView.setText(localDataSet[position]);
+    public void onBindViewHolder(ViewHolder viewHolder, int position) {
+        CardView cardView = viewHolder.cardView;
+        cardView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent resultIntent = new Intent();
+                resultIntent.putExtra("profilePath", localDataSet.get(position));
+                activity.setResult(Activity.RESULT_OK, resultIntent);
+                activity.finish();
+            }
+        });
+
+        ImageView imageView = cardView.findViewById(R.id.imageView);
+        Glide.with(activity).load(localDataSet.get(position)).centerCrop().override(500).into(imageView);
     }
 
     // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
-        return localDataSet.length;
+        return localDataSet.size();
     }
 }
