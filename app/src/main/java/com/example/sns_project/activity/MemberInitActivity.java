@@ -21,6 +21,7 @@ import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.bumptech.glide.Glide;
 import com.example.sns_project.BackKeyHandler;
 import com.example.sns_project.MemberInfo;
 import com.example.sns_project.R;
@@ -41,7 +42,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 
-public class MemberInitActivity extends AppCompatActivity {
+public class MemberInitActivity extends BasicActivity {
 
     private String profilePath;
     private FirebaseUser user;
@@ -204,8 +205,7 @@ public class MemberInitActivity extends AppCompatActivity {
                 if (resultCode == Activity.RESULT_OK) {
                     profilePath = data.getStringExtra("profilePath");
                     Log.e("로그: ", "profilePath: " + profilePath);
-                    Bitmap bitmap = BitmapFactory.decodeFile(profilePath);
-                    profileImageView.setImageBitmap(bitmap);
+                    Glide.with(this).load(profilePath).centerCrop().override(500).into(profileImageView);
                 }
                 break;
         }

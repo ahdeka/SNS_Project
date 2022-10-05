@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -20,7 +21,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BasicActivity {
 
     private static final String TAG = "MainActivity";
     private BackKeyHandler backKeyHandler = new BackKeyHandler(this);
@@ -34,13 +35,13 @@ public class MainActivity extends AppCompatActivity {
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         findViewById(R.id.btnLogout).setOnClickListener(onClickListener);
+        findViewById(R.id.btnWritePost).setOnClickListener(onClickListener);
         userName = findViewById(R.id.tvUser);
 
         if (user == null) {
             startMyActivity(LoginActivity.class);
+
         } else {
-//            startMyActivity(MemberInitActivity.class);
-//            startMyActivity(CameraActivity.class);
 
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             DocumentReference docRef = db.collection("users").document(user.getUid());
@@ -77,14 +78,21 @@ public class MainActivity extends AppCompatActivity {
                     FirebaseAuth.getInstance().signOut();
                     startMyActivity(LoginActivity.class);
                     break;
+                case R.id.btnWritePost:
+                    startMyActivity(WritePostActivity.class);
+                    break;
             }
         }
     };
 
     private void startMyActivity(Class C) {
         Intent intent = new Intent(this, C);
-        finishAffinity();
-        startActivity(intent);
+        if (C.equals(LoginActivity.class)) {
+            finishAffinity();
+            startActivity(intent);
+        } else {
+            startActivityForResult(intent, 1);
+        }
     }
 
     @Override
