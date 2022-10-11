@@ -113,7 +113,7 @@ public class WritePostActivity extends BasicActivity {
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference();
 
-            for (int i = 0; i < 1; i++) {
+            for (int i = 0; i < parent.getChildCount(); i++) {
                 View view = parent.getChildAt(i);
 
                 if (view instanceof TextInputEditText) {
