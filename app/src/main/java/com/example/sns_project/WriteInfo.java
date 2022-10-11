@@ -8,13 +8,13 @@ public class WriteInfo {
     private String title;
     private ArrayList<String> contents;
     private String publisher;
-    private Date created;
+    private Date createdAt;
 
-    public WriteInfo(String title, ArrayList<String> contents, String publisher, Date creatAt) {
+    public WriteInfo(String title, ArrayList<String> contents, String publisher, Date createdAt) {
         this.title = title;
         this.contents = contents;
         this.publisher = publisher;
-        this.created = creatAt;
+        this.createdAt = createdAt;
     }
 
     public String getTitle() {
@@ -41,11 +41,11 @@ public class WriteInfo {
         this.publisher = publisher;
     }
 
-    public Date getCreated() {
-        return created;
+    public Date getCreatedAt() {
+        return createdAt;
     }
 
-    public void setCreated(Date created) {
-        this.created = created;
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
     }
 }

@@ -22,7 +22,6 @@ public class GalleryActivity extends BasicActivity {
 
     private RecyclerView mRecyclerView;
     private RecyclerView.Adapter mAdapter;
-    private RecyclerView.LayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +35,6 @@ public class GalleryActivity extends BasicActivity {
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, numberOfCol));
 
-        String[] localDataSet = {"강아지", "고양이", "호랑이", "드래곤"};
         mAdapter = new GalleryAdapter(this, getImagesPath(this));
         mRecyclerView.setAdapter(mAdapter);
 
@@ -53,13 +51,11 @@ public class GalleryActivity extends BasicActivity {
         Intent intent = getIntent();
         if (intent.getStringExtra("media").equals("video")) {
             uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
-            projection = new String[]{MediaStore.MediaColumns.DATA,
-                    MediaStore.Video.Media.BUCKET_DISPLAY_NAME};
         } else {
-            uri = android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
-            projection = new String[]{MediaStore.MediaColumns.DATA,
-                    MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
+            uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
         }
+        projection = new String[]{MediaStore.MediaColumns.DATA,
+                MediaStore.Video.Media.BUCKET_DISPLAY_NAME};
 
 
         cursor = activity.getContentResolver().query(uri, projection, null, null, null);
