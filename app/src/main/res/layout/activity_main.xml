@@ -4,26 +4,12 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <LinearLayout
+    <androidx.recyclerview.widget.RecyclerView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:layout_height="match_parent"
+        android:id="@+id/recyclerMainView">
 
-        <TextView
-            android:id="@+id/tvUser"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:textSize="40dp"
-            android:gravity="center"
-            android:layout_marginBottom="50dp"/>
-
-        <Button
-            android:id="@+id/btnLogout"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="로그아웃"/>
-
-    </LinearLayout>
+    </androidx.recyclerview.widget.RecyclerView>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnWritePost"

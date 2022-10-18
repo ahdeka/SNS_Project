@@ -4,19 +4,17 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -46,6 +44,7 @@ public class MemberInitActivity extends BasicActivity {
 
     private String profilePath;
     private FirebaseUser user;
+    private RelativeLayout loaderLayout;
     private static final String TAG = "MemberInfoActivity";
     private ImageView profileImageView;
     private BackKeyHandler backKeyHandler = new BackKeyHandler(this);
@@ -55,6 +54,7 @@ public class MemberInitActivity extends BasicActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_member_info);
 
+        loaderLayout = findViewById(R.id.loaderLayout);
         profileImageView = findViewById(R.id.ivProfile);
         profileImageView.setOnClickListener(onClickListener);
 
@@ -68,7 +68,7 @@ public class MemberInitActivity extends BasicActivity {
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.btnConfirm:
-                    profileUpdate();
+                    storageUpload();
                     break;
                 case R.id.ivProfile:
                     CardView cardView = findViewById(R.id.buttonsCardView);
@@ -83,7 +83,6 @@ public class MemberInitActivity extends BasicActivity {
                     startMyActivity(CameraActivity.class);
                     break;
                 case R.id.gallery:
-
                     if (ContextCompat.checkSelfPermission(
                             MemberInitActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) !=
                             PackageManager.PERMISSION_GRANTED) {
@@ -121,7 +120,7 @@ public class MemberInitActivity extends BasicActivity {
     }
 
 
-    private void profileUpdate() {
+    private void storageUpload() {
         final String name = ((EditText) findViewById(R.id.etName)).getText().toString();
         final String birth = ((EditText) findViewById(R.id.etBirth)).getText().toString();
         final String phone = ((EditText) findViewById(R.id.etPhone)).getText().toString();
@@ -129,6 +128,7 @@ public class MemberInitActivity extends BasicActivity {
 
         if (name.length() > 0 && phone.length() > 9 && birth.length() > 5 && address.length() > 0) {
 
+            loaderLayout.setVisibility(View.VISIBLE);
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference();
             user = FirebaseAuth.getInstance().getCurrentUser();
@@ -137,7 +137,7 @@ public class MemberInitActivity extends BasicActivity {
 
             if (profilePath == null) {
                 MemberInfo memberInfo = new MemberInfo(name, birth, phone, address);
-                uploader(memberInfo);
+                storeUploader(memberInfo);
             } else {
                 try {
                     InputStream stream = new FileInputStream(new File(profilePath));
@@ -157,7 +157,7 @@ public class MemberInitActivity extends BasicActivity {
                             if (task.isSuccessful()) {
                                 Uri downloadUri = task.getResult();
                                 MemberInfo memberInfo = new MemberInfo(name, birth, phone, address, downloadUri.toString());
-                                uploader(memberInfo);
+                                storeUploader(memberInfo);
 
                                 Log.e("성공", "성공: " + downloadUri);
 
@@ -178,13 +178,14 @@ public class MemberInitActivity extends BasicActivity {
 
     }
 
-    private void uploader(MemberInfo memberInfo) {
+    private void storeUploader(MemberInfo memberInfo) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users").document(user.getUid()).set(memberInfo)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
                         startToast("회원정보 등록을 성공하였습니다.");
+                        loaderLayout.setVisibility(View.GONE);
                         startMyActivity(MainActivity.class);
                     }
                 })
@@ -192,6 +193,7 @@ public class MemberInitActivity extends BasicActivity {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         startToast("회원정보 등록에 실패하였습니다.");
+                        loaderLayout.setVisibility(View.GONE);
                         Log.w(TAG, "Error writing document", e);
                     }
                 });

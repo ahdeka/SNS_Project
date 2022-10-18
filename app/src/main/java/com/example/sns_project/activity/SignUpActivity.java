@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -55,23 +56,20 @@ public class SignUpActivity extends BasicActivity {
 
         if (email.length() > 0 && password.length() > 0 && passwordCheck.length() > 0) {
             if (password.equals(passwordCheck)) {
+                final RelativeLayout loaderLayout = findViewById(R.id.loaderLayout);
+                loaderLayout.setVisibility(View.VISIBLE);
                 mAuth.createUserWithEmailAndPassword(email, password)
                         .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                             @Override
                             public void onComplete(@NonNull Task<AuthResult> task) {
+                                loaderLayout.setVisibility(View.GONE);
                                 if (task.isSuccessful()) {
-                                    // Sign in success, update UI with the signed-in user's information = 로그인 성공했을 때 로직
-//                                Log.d(TAG, "createUserWithEmail:success");
                                     FirebaseUser user = mAuth.getCurrentUser();
                                     startToast("회원가입이 완료되었습니다.");
                                     startLoginActivity();
-//                            updateUI(user);
                                 } else {
                                     if (task.getException() != null)
                                         startToast(task.getException().toString());
-                                    // If sign in fails, display a message to the user. = 로그인 실패했을 때 로직
-//                                Log.w(TAG, "createUserWithEmail:failure", task.getException());
-//                            updateUI(null);
                                 }
                             }
                         });
