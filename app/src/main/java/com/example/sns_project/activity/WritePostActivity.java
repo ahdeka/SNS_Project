@@ -205,8 +205,9 @@ public class WritePostActivity extends BasicActivity {
                         }
                     } else {
                         contentsList.add(pathList.get(pathCount));
+                        String[] pathArray = pathList.get(pathCount).split("\\.");
                         final StorageReference mountainImagesRef = storageRef.child
-                                ("posts/" + documentReference.getId() + "/" + pathCount + "jpg");
+                                ("posts/" + documentReference.getId() + "/" + pathCount + "." + pathArray[pathArray.length - 1]);
 
                         try {
 

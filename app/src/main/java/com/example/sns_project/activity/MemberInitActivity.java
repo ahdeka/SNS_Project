@@ -83,42 +83,11 @@ public class MemberInitActivity extends BasicActivity {
                     startMyActivity(CameraActivity.class);
                     break;
                 case R.id.gallery:
-                    if (ContextCompat.checkSelfPermission(
-                            MemberInitActivity.this, Manifest.permission.READ_EXTERNAL_STORAGE) !=
-                            PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(MemberInitActivity.this,
-                                new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                                1);
-
-                        if (ActivityCompat.shouldShowRequestPermissionRationale(MemberInitActivity.this,
-                                Manifest.permission.READ_EXTERNAL_STORAGE)) {
-                        } else {
-                            startToast("권한을 허용해주세요");
-                        }
-                    } else {
-                        startMyActivity(GalleryActivity.class);
-                    }
+                    startMyActivity(GalleryActivity.class);
                     break;
             }
         }
     };
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                           int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        switch (requestCode) {
-            case 1:
-                // If request is cancelled, the result arrays are empty.
-                if (grantResults.length > 0 &&
-                        grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startMyActivity(GalleryActivity.class);
-                } else {
-                    startToast("권한을 허용해주세요");
-                }
-        }
-    }
-
 
     private void storageUpload() {
         final String name = ((EditText) findViewById(R.id.etName)).getText().toString();
