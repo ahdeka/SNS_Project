@@ -71,6 +71,7 @@ public class MainActivity extends BasicActivity {
                 }
             });
 
+            /*
             firebaseFirestore.collection("posts")
                     .get()
                     .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -98,6 +99,7 @@ public class MainActivity extends BasicActivity {
                             }
                         }
                     });
+             */
         }
 
         mRecyclerView = findViewById(R.id.recyclerMainView);
