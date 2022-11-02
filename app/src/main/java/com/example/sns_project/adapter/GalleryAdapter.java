@@ -42,9 +42,6 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
         }
 
-        public CardView getCardView() {
-            return cardView;
-        }
     }
 
     /**
@@ -67,14 +64,11 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
         final ViewHolder viewHolder = new ViewHolder(cardView);
 
-        cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent resultIntent = new Intent();
-                resultIntent.putExtra("profilePath", localDataSet.get(viewHolder.getAdapterPosition()));
-                activity.setResult(Activity.RESULT_OK, resultIntent);
-                activity.finish();
-            }
+        cardView.setOnClickListener(view -> {
+            Intent resultIntent = new Intent();
+            resultIntent.putExtra("profilePath", localDataSet.get(viewHolder.getAdapterPosition()));
+            activity.setResult(Activity.RESULT_OK, resultIntent);
+            activity.finish();
         });
 
         return viewHolder;

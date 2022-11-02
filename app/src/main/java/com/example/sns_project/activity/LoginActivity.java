@@ -1,14 +1,14 @@
 package com.example.sns_project.activity;
 
+import static com.example.sns_project.Util.showToast;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.sns_project.BackKeyHandler;
 import com.example.sns_project.R;
@@ -77,22 +77,18 @@ public class LoginActivity extends BasicActivity {
                             loaderLayout.setVisibility(View.GONE);
                             if (task.isSuccessful()) {
                                 FirebaseUser user = mAuth.getCurrentUser();
-                                startToast("로그인에 성공했습니다.");
+                                showToast(LoginActivity.this, "로그인에 성공했습니다.");
                                 startMyActivity(MainActivity.class);
                             } else {
                                 if (task.getException() != null)
-                                    startToast(task.getException().toString());
+                                    showToast(LoginActivity.this, task.getException().toString());
                             }
                         }
                     });
         } else {
-            startToast("이메일 또는 비밀번호를 입력해주세요.");
+            showToast(LoginActivity.this, "이메일 또는 비밀번호를 입력해주세요.");
         }
 
-    }
-
-    private void startToast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
     private void startMyActivity(Class C) {

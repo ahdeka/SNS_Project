@@ -1,26 +1,20 @@
 package com.example.sns_project.activity;
 
+import static com.example.sns_project.Util.showToast;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
-
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.sns_project.R;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class SignUpActivity extends BasicActivity {
 
     private FirebaseAuth mAuth;
-    private final static String TAG = "SignUpActivity";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,17 +29,14 @@ public class SignUpActivity extends BasicActivity {
 
     }
 
-    View.OnClickListener onClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            switch (view.getId()) {
-                case R.id.btnSignUp:
-                    signUp();
-                    break;
-                case R.id.btnBack:
-                    startLoginActivity();
-                    break;
-            }
+    View.OnClickListener onClickListener = view -> {
+        switch (view.getId()) {
+            case R.id.btnSignUp:
+                signUp();
+                break;
+            case R.id.btnBack:
+                startLoginActivity();
+                break;
         }
     };
 
@@ -59,25 +50,22 @@ public class SignUpActivity extends BasicActivity {
                 final RelativeLayout loaderLayout = findViewById(R.id.loaderLayout);
                 loaderLayout.setVisibility(View.VISIBLE);
                 mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                            @Override
-                            public void onComplete(@NonNull Task<AuthResult> task) {
-                                loaderLayout.setVisibility(View.GONE);
-                                if (task.isSuccessful()) {
-                                    FirebaseUser user = mAuth.getCurrentUser();
-                                    startToast("회원가입이 완료되었습니다.");
-                                    startLoginActivity();
-                                } else {
-                                    if (task.getException() != null)
-                                        startToast(task.getException().toString());
-                                }
+                        .addOnCompleteListener(this, task -> {
+                            loaderLayout.setVisibility(View.GONE);
+                            if (task.isSuccessful()) {
+                                FirebaseUser user = mAuth.getCurrentUser();
+                                showToast(SignUpActivity.this, "회원가입이 완료되었습니다.");
+                                startLoginActivity();
+                            } else {
+                                if (task.getException() != null)
+                                    showToast(SignUpActivity.this, task.getException().toString());
                             }
                         });
             } else {
-                startToast("비밀번호가 일치하지 않습니다.");
+                showToast(SignUpActivity.this, "비밀번호가 일치하지 않습니다.");
             }
         } else {
-            startToast("이메일 또는 비밀번호를 입력해주세요.");
+            showToast(SignUpActivity.this, "이메일 또는 비밀번호를 입력해주세요.");
         }
 
     }
@@ -88,7 +76,4 @@ public class SignUpActivity extends BasicActivity {
         startActivity(intent);
     }
 
-    private void startToast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-    }
 }

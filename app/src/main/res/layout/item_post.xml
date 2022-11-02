@@ -31,17 +31,27 @@
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/postMenu"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
                     android:src="@drawable/ic_baseline_more_vert_24"/>
 
         </LinearLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="3dp"
+            android:layout_marginBottom="3dp"
+            android:background="#63CFCFCF">
+
+        </RelativeLayout>
 
 
         <LinearLayout
             android:id="@+id/contentsLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:padding="10dp"
             android:orientation="vertical">
 
         </LinearLayout>

@@ -1,9 +1,9 @@
 package com.example.sns_project.activity;
 
-import android.Manifest;
+import static com.example.sns_project.Util.showToast;
+
 import android.app.Activity;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,23 +11,14 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.cardview.widget.CardView;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.bumptech.glide.Glide;
 import com.example.sns_project.BackKeyHandler;
 import com.example.sns_project.MemberInfo;
 import com.example.sns_project.R;
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -35,7 +26,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -63,29 +53,26 @@ public class MemberInitActivity extends BasicActivity {
         findViewById(R.id.gallery).setOnClickListener(onClickListener);
     }
 
-    View.OnClickListener onClickListener = new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-            switch (view.getId()) {
-                case R.id.btnConfirm:
-                    storageUpload();
-                    break;
-                case R.id.ivProfile:
-                    CardView cardView = findViewById(R.id.buttonsCardView);
-                    Log.e("로그", "로그: " + cardView.getVisibility());
-                    if (cardView.getVisibility() == view.VISIBLE) {
-                        cardView.setVisibility(view.GONE);
-                    } else {
-                        cardView.setVisibility(view.VISIBLE);
-                    }
-                    break;
-                case R.id.picture:
-                    startMyActivity(CameraActivity.class);
-                    break;
-                case R.id.gallery:
-                    startMyActivity(GalleryActivity.class);
-                    break;
-            }
+    View.OnClickListener onClickListener = view -> {
+        switch (view.getId()) {
+            case R.id.btnConfirm:
+                storageUpload();
+                break;
+            case R.id.ivProfile:
+                CardView cardView = findViewById(R.id.buttonsCardView);
+                Log.e("로그", "로그: " + cardView.getVisibility());
+                if (cardView.getVisibility() == view.VISIBLE) {
+                    cardView.setVisibility(view.GONE);
+                } else {
+                    cardView.setVisibility(view.VISIBLE);
+                }
+                break;
+            case R.id.picture:
+                startMyActivity(CameraActivity.class);
+                break;
+            case R.id.gallery:
+                startMyActivity(GalleryActivity.class);
+                break;
         }
     };
 
@@ -109,40 +96,34 @@ public class MemberInitActivity extends BasicActivity {
                 storeUploader(memberInfo);
             } else {
                 try {
-                    InputStream stream = new FileInputStream(new File(profilePath));
+                    InputStream stream = new FileInputStream(profilePath);
 
                     UploadTask uploadTask = mountainImagesRef.putStream(stream);
-                    uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-                        @Override
-                        public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-                            if (!task.isSuccessful()) {
-                                throw task.getException();
-                            }
-                            return mountainImagesRef.getDownloadUrl();
+                    uploadTask.continueWithTask(task -> {
+                        if (!task.isSuccessful()) {
+                            throw task.getException();
                         }
-                    }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Uri> task) {
-                            if (task.isSuccessful()) {
-                                Uri downloadUri = task.getResult();
-                                MemberInfo memberInfo = new MemberInfo(name, birth, phone, address, downloadUri.toString());
-                                storeUploader(memberInfo);
+                        return mountainImagesRef.getDownloadUrl();
+                    }).addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Uri downloadUri = task.getResult();
+                            MemberInfo memberInfo = new MemberInfo(name, birth, phone, address, downloadUri.toString());
+                            storeUploader(memberInfo);
 
-                                Log.e("성공", "성공: " + downloadUri);
+                            Log.e("성공", "성공: " + downloadUri);
 
-                            } else {
-                                Log.e("로그", "실패");
-                            }
+                        } else {
+                            Log.e("로그", "실패");
                         }
                     });
 
                 } catch (FileNotFoundException e) {
-                    Log.e("로그: ", "에러: " + e.toString());
+                    Log.e("로그: ", "에러: " + e);
                 }
             }
 
         } else {
-            startToast("회원정보를 입력해주세요.");
+            showToast(MemberInitActivity.this, "회원정보를 입력해주세요.");
         }
 
     }
@@ -150,21 +131,15 @@ public class MemberInitActivity extends BasicActivity {
     private void storeUploader(MemberInfo memberInfo) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users").document(user.getUid()).set(memberInfo)
-                .addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        startToast("회원정보 등록을 성공하였습니다.");
-                        loaderLayout.setVisibility(View.GONE);
-                        startMyActivity(MainActivity.class);
-                    }
+                .addOnSuccessListener(aVoid -> {
+                    showToast(MemberInitActivity.this, "회원정보 등록을 성공하였습니다.");
+                    loaderLayout.setVisibility(View.GONE);
+                    startMyActivity(MainActivity.class);
                 })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        startToast("회원정보 등록에 실패하였습니다.");
-                        loaderLayout.setVisibility(View.GONE);
-                        Log.w(TAG, "Error writing document", e);
-                    }
+                .addOnFailureListener(e -> {
+                    showToast(MemberInitActivity.this, "회원정보 등록에 실패하였습니다.");
+                    loaderLayout.setVisibility(View.GONE);
+                    Log.w(TAG, "Error writing document", e);
                 });
     }
 
@@ -190,10 +165,6 @@ public class MemberInitActivity extends BasicActivity {
             finishAffinity();
             startActivity(intent);
         }
-    }
-
-    private void startToast(String msg) {
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
     @Override
