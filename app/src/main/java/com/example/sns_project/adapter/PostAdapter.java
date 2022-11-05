@@ -1,7 +1,9 @@
 package com.example.sns_project.adapter;
 
+import static com.example.sns_project.Util.isStorageUri;
+
 import android.app.Activity;
-import android.util.Patterns;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
@@ -18,6 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.sns_project.PostInfo;
 import com.example.sns_project.R;
+import com.example.sns_project.activity.PostActivity;
 import com.example.sns_project.listener.OnPostListener;
 
 import java.text.SimpleDateFormat;
@@ -65,6 +68,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         final ViewHolder viewHolder = new ViewHolder(cardView);
 
         cardView.setOnClickListener(view -> {
+            Intent intent = new Intent(activity, PostActivity.class);
+            intent.putExtra("postInfo", localDataSet.get(viewHolder.getAdapterPosition()));
+            activity.startActivity(intent);
         });
 
         cardView.findViewById(R.id.postMenu).setOnClickListener(view -> showPopup(view, viewHolder.getAdapterPosition()));
@@ -101,7 +107,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
                     break;
                 }
                 String contents = contentsList.get(i);
-                if (Patterns.WEB_URL.matcher(contents).matches() && contents.contains("https://firebasestorage.googleapis.com/v0/b/sns-project-3731f.appspot.com/o/posts")) {
+                if (isStorageUri(contents)) {
                     ImageView imageView = new ImageView(activity);
                     imageView.setLayoutParams(layoutParams);
                     imageView.setAdjustViewBounds(true);

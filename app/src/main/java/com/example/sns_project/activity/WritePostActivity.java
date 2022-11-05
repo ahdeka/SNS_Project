@@ -1,15 +1,14 @@
 package com.example.sns_project.activity;
 
+import static com.example.sns_project.Util.isStorageUri;
 import static com.example.sns_project.Util.showToast;
+import static com.example.sns_project.Util.storageUriToName;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.InputType;
 import android.util.Log;
-import android.util.Patterns;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -20,6 +19,7 @@ import androidx.annotation.Nullable;
 import com.bumptech.glide.Glide;
 import com.example.sns_project.PostInfo;
 import com.example.sns_project.R;
+import com.example.sns_project.view.ContentsItemView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -93,39 +93,22 @@ public class WritePostActivity extends BasicActivity {
 
             for (int i = 0; i < contentsList.size(); i++) {
                 String contents = contentsList.get(i);
-                if (Patterns.WEB_URL.matcher(contents).matches() && contents.contains("https://firebasestorage.googleapis.com/v0/b/sns-project-3731f.appspot.com/o/posts")) {
+                if (isStorageUri(contents)) {
                     pathList.add(contents);
-                    ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                    LinearLayout linearLayout = new LinearLayout(WritePostActivity.this);
-                    linearLayout.setLayoutParams(layoutParams);
-                    linearLayout.setOrientation(LinearLayout.VERTICAL);
-                    parent.addView(linearLayout);
-
-                    ImageView imageView = new ImageView(WritePostActivity.this);
-                    imageView.setLayoutParams(layoutParams);
-                    imageView.setAdjustViewBounds(true);
-                    imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                    imageView.setOnClickListener(view -> {
+                    ContentsItemView contentsItemView = new ContentsItemView(this);
+                    parent.addView(contentsItemView);
+                    contentsItemView.setImage(contents);
+                    contentsItemView.setOnClickListener(view -> {
                         btnBackgroundLayout.setVisibility(View.VISIBLE);
                         selectedImageView = (ImageView) view;
                     });
-                    Glide.with(this).load(contents).override(1000).into(imageView);
-                    linearLayout.addView(imageView);
-
-                    EditText editText = new EditText(WritePostActivity.this);
-                    editText.setLayoutParams(layoutParams);
-                    editText.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_CLASS_TEXT);
-                    editText.setHint("내용");
+                    contentsItemView.setOnFocusChangeListener(onFocusChangeListener);
                     if (i < contentsList.size() - 1) {
                         String nextContents = contentsList.get(i + 1);
-                        if (!Patterns.WEB_URL.matcher(nextContents).matches() || !nextContents.contains("https://firebasestorage.googleapis.com/v0/b/sns-project-3731f.appspot.com/o/posts")) {
-                            editText.setText(nextContents);
+                        if (!isStorageUri(nextContents)) {
+                            contentsItemView.setText(nextContents);
                         }
                     }
-                    editText.setOnFocusChangeListener(onFocusChangeListener);
-                    linearLayout.addView(editText);
                 } else if (i == 0) {
                     etWriteContents.setText(contents);
                 }
@@ -142,43 +125,25 @@ public class WritePostActivity extends BasicActivity {
 
                     String profilePath = data.getStringExtra("profilePath");
                     pathList.add(profilePath);
-
-                    ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                            ViewGroup.LayoutParams.WRAP_CONTENT);
-
-                    LinearLayout linearLayout = new LinearLayout(WritePostActivity.this);
-                    linearLayout.setLayoutParams(layoutParams);
-                    linearLayout.setOrientation(LinearLayout.VERTICAL);
+                    ContentsItemView contentsItemView = new ContentsItemView(this);
 
                     if (selectedEditText == null) {
-                        parent.addView(linearLayout);
+                        parent.addView(contentsItemView);
                     } else {
                         for (int i = 0; i < parent.getChildCount(); i++) {
                             if (parent.getChildAt(i) == selectedEditText.getParent()) {
-                                parent.addView(linearLayout, i + 1);
+                                parent.addView(contentsItemView, i + 1);
                                 break;
                             }
                         }
                     }
 
-
-                    ImageView imageView = new ImageView(WritePostActivity.this);
-                    imageView.setLayoutParams(layoutParams);
-                    imageView.setAdjustViewBounds(true);
-                    imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                    imageView.setOnClickListener(view -> {
+                    contentsItemView.setImage(profilePath);
+                    contentsItemView.setOnClickListener(view -> {
                         btnBackgroundLayout.setVisibility(View.VISIBLE);
                         selectedImageView = (ImageView) view;
                     });
-                    Glide.with(this).load(profilePath).override(1000).into(imageView);
-                    linearLayout.addView(imageView);
-
-                    EditText editText = new EditText(WritePostActivity.this);
-                    editText.setLayoutParams(layoutParams);
-                    editText.setInputType(InputType.TYPE_TEXT_FLAG_MULTI_LINE | InputType.TYPE_CLASS_TEXT);
-                    editText.setHint("내용");
-                    editText.setOnFocusChangeListener(onFocusChangeListener);
-                    linearLayout.addView(editText);
+                    contentsItemView.setOnFocusChangeListener(onFocusChangeListener);
                 }
                 break;
             case 1:
@@ -218,23 +183,17 @@ public class WritePostActivity extends BasicActivity {
                     btnBackgroundLayout.setVisibility(View.GONE);
                     break;
                 case R.id.delete:
-                    View selectedView = (View) selectedImageView.getParent();
-
-                    String[] list = pathList.get(parent.indexOfChild(selectedView) - 1).split("\\?");
-                    String[] list2 = list[0].split("%2F");
-                    String name = list2[list2.length - 1];
-
-                    StorageReference desertRef = storageRef.child("posts/" + postInfo.getId() + "/" + name);
+                    final View selectedView = (View) selectedImageView.getParent();
+                    StorageReference desertRef = storageRef.child("posts/" + postInfo.getId() + "/"
+                            + storageUriToName(pathList.get(parent.indexOfChild(selectedView) - 1)));
                     desertRef.delete().addOnSuccessListener(aVoid -> {
-//                                successCount--;
-//                                storeUploader(id);
                                 showToast(WritePostActivity.this, "파일을 삭제하였습니다.");
+                                pathList.remove(parent.indexOfChild(selectedView) - 1);
+                                parent.removeView(selectedView);
+                                btnBackgroundLayout.setVisibility(View.GONE);
                             })
                             .addOnFailureListener(exception -> showToast(WritePostActivity.this, "파일을 삭제하는데 실패했습니다."));
 
-                    pathList.remove(parent.indexOfChild(selectedView) - 1);
-                    parent.removeView(selectedView);
-                    btnBackgroundLayout.setVisibility(View.GONE);
                     break;
             }
         }
@@ -276,7 +235,7 @@ public class WritePostActivity extends BasicActivity {
                         if (text.length() > 0) {
                             contentsList.add(text);
                         }
-                    } else if (!Patterns.WEB_URL.matcher(pathList.get(pathCount)).matches()) {
+                    } else if (!isStorageUri(pathList.get(pathCount))) {
                         String path = pathList.get(pathCount);
                         successCount++;
                         contentsList.add(path);
@@ -301,7 +260,7 @@ public class WritePostActivity extends BasicActivity {
                                     if (successCount == 0) {
                                         // 완료
                                         PostInfo postInfo1 = new PostInfo(title, contentsList, user.getUid(), date);
-                                        storeUploader(documentReference, postInfo1);
+                                        storeUpload(documentReference, postInfo1);
                                     }
                                 });
                             });
@@ -316,7 +275,7 @@ public class WritePostActivity extends BasicActivity {
 
             }
             if (successCount == 0) {
-                storeUploader(documentReference, new PostInfo(title, contentsList, user.getUid(), date));
+                storeUpload(documentReference, new PostInfo(title, contentsList, user.getUid(), date));
             }
 
         } else {
@@ -324,8 +283,8 @@ public class WritePostActivity extends BasicActivity {
         }
     }
 
-    private void storeUploader(DocumentReference documentReference, PostInfo postInfo) {
-        documentReference.set(postInfo)
+    private void storeUpload(DocumentReference documentReference, PostInfo postInfo) {
+        documentReference.set(postInfo.getPostInfo())
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "DocumentSnapshot successfully written!");
                     showToast(WritePostActivity.this, "게시글을 등록했습니다.");

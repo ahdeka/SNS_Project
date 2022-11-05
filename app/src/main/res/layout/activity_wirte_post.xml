@@ -35,12 +35,8 @@
                     android:layout_height="wrap_content"
                     android:orientation="vertical">
 
-                    <EditText
-                        android:id="@+id/etWriteContents"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginBottom="20dp"
-                        android:hint="내용" />
+                    <include
+                        layout="@layout/view_contents_edit_text"/>
                 </LinearLayout>
 
 

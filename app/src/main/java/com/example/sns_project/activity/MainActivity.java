@@ -1,11 +1,12 @@
 package com.example.sns_project.activity;
 
+import static com.example.sns_project.Util.isStorageUri;
 import static com.example.sns_project.Util.showToast;
+import static com.example.sns_project.Util.storageUriToName;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
-import android.util.Patterns;
 import android.view.View;
 
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -133,12 +134,9 @@ public class MainActivity extends BasicActivity {
             ArrayList<String> contentsList = postList.get(position).getContents();
             for (int i = 0; i < contentsList.size(); i++) {
                 String contents = contentsList.get(i);
-                if (Patterns.WEB_URL.matcher(contents).matches() && contents.contains("https://firebasestorage.googleapis.com/v0/b/sns-project-3731f.appspot.com/o/posts")) {
+                if (isStorageUri(contents)) {
                     successCount++;
-                    String[] list = contents.split("\\?");
-                    String[] list2 = list[0].split("%2F");
-                    String name = list2[list2.length - 1];
-                    StorageReference desertRef = storageRef.child("posts/" + id + "/" + name);
+                    StorageReference desertRef = storageRef.child("posts/" + id + "/" + storageUriToName(contents));
                     desertRef.delete().addOnSuccessListener(aVoid -> {
                                 successCount--;
                                 storeUploader(id);
