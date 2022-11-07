@@ -1,5 +1,8 @@
 package com.example.sns_project.activity;
 
+import static com.example.sns_project.Util.GALLERY_IMAGE;
+import static com.example.sns_project.Util.GALLERY_VIDEO;
+import static com.example.sns_project.Util.INTENT_MEDIA;
 import static com.example.sns_project.Util.showToast;
 
 import android.Manifest;
@@ -28,6 +31,7 @@ public class GalleryActivity extends BasicActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gallery);
+        setToolbarTitle("갤러리");
 
         if (ContextCompat.checkSelfPermission(GalleryActivity.this,
                 Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -39,7 +43,7 @@ public class GalleryActivity extends BasicActivity {
             if (ActivityCompat.shouldShowRequestPermissionRationale(GalleryActivity.this,
                     Manifest.permission.READ_EXTERNAL_STORAGE)) {
             } else {
-                showToast(GalleryActivity.this, "권한을 허용해주세요");
+                    showToast(GalleryActivity.this, getResources().getString(R.string.please_grant_permission));
             }
         } else {
             recycleInit();
@@ -57,7 +61,7 @@ public class GalleryActivity extends BasicActivity {
                     recycleInit();
                 } else {
                     finish();
-                    showToast(GalleryActivity.this, "권한을 허용해주세요");
+                    showToast(GalleryActivity.this, getResources().getString(R.string.please_grant_permission));
                 }
 
             }
@@ -85,13 +89,17 @@ public class GalleryActivity extends BasicActivity {
         String[] projection;
 
         Intent intent = getIntent();
-        if (intent.getStringExtra("media").equals("video")) {
+        final int media = intent.getIntExtra(INTENT_MEDIA, GALLERY_IMAGE);
+
+        if (media == GALLERY_VIDEO) {
             uri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+            projection = new String[]{MediaStore.MediaColumns.DATA,
+                    MediaStore.Video.Media.BUCKET_DISPLAY_NAME};
         } else {
             uri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+            projection = new String[]{MediaStore.MediaColumns.DATA,
+                    MediaStore.Images.Media.BUCKET_DISPLAY_NAME};
         }
-        projection = new String[]{MediaStore.MediaColumns.DATA,
-                MediaStore.Video.Media.BUCKET_DISPLAY_NAME};
 
 
         cursor = activity.getContentResolver().query(uri, projection, null, null, null);

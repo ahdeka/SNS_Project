@@ -1,5 +1,7 @@
 package com.example.sns_project.adapter;
 
+import static com.example.sns_project.Util.INTENT_PATH;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -66,24 +68,27 @@ public class GalleryAdapter extends RecyclerView.Adapter<GalleryAdapter.ViewHold
 
         cardView.setOnClickListener(view -> {
             Intent resultIntent = new Intent();
-            resultIntent.putExtra("profilePath", localDataSet.get(viewHolder.getAdapterPosition()));
+            resultIntent.putExtra(INTENT_PATH, localDataSet.get(viewHolder.getAdapterPosition()));
             activity.setResult(Activity.RESULT_OK, resultIntent);
             activity.finish();
         });
 
+        ImageView imageView = cardView.findViewById(R.id.imageView);
+        Glide.with(activity).load(localDataSet.get(viewType)).centerCrop().override(500).into(imageView);
+
         return viewHolder;
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
     @Override
-    public void onBindViewHolder(final ViewHolder viewHolder, int position) {
-        CardView cardView = viewHolder.cardView;
-
-        ImageView imageView = cardView.findViewById(R.id.imageView);
-        Glide.with(activity).load(localDataSet.get(position)).centerCrop().override(500).into(imageView);
+    public int getItemViewType(int position) {
+        return position;
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
+    @Override
+    public void onBindViewHolder(final ViewHolder viewHolder, int position) {
+//        CardView cardView = viewHolder.cardView;
+    }
+
     @Override
     public int getItemCount() {
         return localDataSet.size();

@@ -16,6 +16,8 @@ package com.example.sns_project.activity;
  * limitations under the License.
  */
 
+import static com.example.sns_project.Util.INTENT_PATH;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.media.Image;
@@ -46,8 +48,6 @@ public class CameraActivity extends BasicActivity {
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-//            mBackgroundHandler.post(new Camera2BasicFragment.ImageUpLoader(reader.acquireNextImage()));
-            Log.e("로그", "캡처");
 
             Image mImage = reader.acquireNextImage();
             File mFile = new File(getExternalFilesDir(null), "profileImage.jpg");
@@ -73,9 +73,9 @@ public class CameraActivity extends BasicActivity {
                 }
             }
 
-            Intent resultIntent = new Intent();
-            resultIntent.putExtra("profilePath", mFile.toString());
-            setResult(Activity.RESULT_OK, resultIntent);
+            Intent intent = new Intent();
+            intent.putExtra(INTENT_PATH, mFile.toString());
+            setResult(Activity.RESULT_OK, intent);
 
             camera2BasicFragment.closeCamera();
             finish();
@@ -87,6 +87,7 @@ public class CameraActivity extends BasicActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera);
+        setToolbarTitle(getResources().getString(R.string.app_name));
         if (null == savedInstanceState) {
             camera2BasicFragment = new Camera2BasicFragment();
             camera2BasicFragment.setOnImageAvailableListener(mOnImageAvailableListener);

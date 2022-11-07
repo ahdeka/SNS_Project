@@ -1,5 +1,9 @@
 package com.example.sns_project.activity;
 
+import static com.example.sns_project.Util.GALLERY_IMAGE;
+import static com.example.sns_project.Util.GALLERY_VIDEO;
+import static com.example.sns_project.Util.INTENT_MEDIA;
+import static com.example.sns_project.Util.INTENT_PATH;
 import static com.example.sns_project.Util.isStorageUri;
 import static com.example.sns_project.Util.showToast;
 import static com.example.sns_project.Util.storageUriToName;
@@ -29,6 +33,8 @@ import com.google.firebase.storage.StorageMetadata;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -54,8 +60,8 @@ public class WritePostActivity extends BasicActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wirte_post);
-
-
+        setToolbarTitle("게시글 작성");
+        
         loaderLayout = findViewById(R.id.loaderLayout);
         parent = findViewById(R.id.contentsLayout);
         btnBackgroundLayout = findViewById(R.id.btnBackgroundLayout);
@@ -123,8 +129,8 @@ public class WritePostActivity extends BasicActivity {
             case 0:
                 if (resultCode == Activity.RESULT_OK) {
 
-                    String profilePath = data.getStringExtra("profilePath");
-                    pathList.add(profilePath);
+                    String path = data.getStringExtra(INTENT_PATH);
+                    pathList.add(path);
                     ContentsItemView contentsItemView = new ContentsItemView(this);
 
                     if (selectedEditText == null) {
@@ -138,7 +144,7 @@ public class WritePostActivity extends BasicActivity {
                         }
                     }
 
-                    contentsItemView.setImage(profilePath);
+                    contentsItemView.setImage(path);
                     contentsItemView.setOnClickListener(view -> {
                         btnBackgroundLayout.setVisibility(View.VISIBLE);
                         selectedImageView = (ImageView) view;
@@ -148,9 +154,9 @@ public class WritePostActivity extends BasicActivity {
                 break;
             case 1:
                 if (resultCode == Activity.RESULT_OK) {
-                    String profilePath = data.getStringExtra("profilePath");
-                    pathList.set(parent.indexOfChild((View) selectedImageView.getParent()) - 1, profilePath);
-                    Glide.with(this).load(profilePath).override(1000).into(selectedImageView);
+                    String path = data.getStringExtra(INTENT_PATH);
+                    pathList.set(parent.indexOfChild((View) selectedImageView.getParent()) - 1, path);
+                    Glide.with(this).load(path).override(1000).into(selectedImageView);
                 }
         }
     }
@@ -163,10 +169,10 @@ public class WritePostActivity extends BasicActivity {
                     storageUpload();
                     break;
                 case R.id.btnImage:
-                    startMyActivity(GalleryActivity.class, "image", 0);
+                    startMyActivity(GalleryActivity.class, GALLERY_IMAGE, 0);
                     break;
                 case R.id.btnVideo:
-                    startMyActivity(GalleryActivity.class, "video", 0);
+                    startMyActivity(GalleryActivity.class, GALLERY_VIDEO, 0);
                     break;
 
                 case R.id.btnBackgroundLayout:
@@ -175,17 +181,18 @@ public class WritePostActivity extends BasicActivity {
                     }
                     break;
                 case R.id.imageModify:
-                    startMyActivity(GalleryActivity.class, "image", 1);
+                    startMyActivity(GalleryActivity.class, GALLERY_IMAGE, 1);
                     btnBackgroundLayout.setVisibility(View.GONE);
                     break;
                 case R.id.videoModify:
-                    startMyActivity(GalleryActivity.class, "video", 1);
+                    startMyActivity(GalleryActivity.class, GALLERY_VIDEO, 1);
                     btnBackgroundLayout.setVisibility(View.GONE);
                     break;
                 case R.id.delete:
                     final View selectedView = (View) selectedImageView.getParent();
+                    String path = pathList.get(parent.indexOfChild(selectedView) - 1);
                     StorageReference desertRef = storageRef.child("posts/" + postInfo.getId() + "/"
-                            + storageUriToName(pathList.get(parent.indexOfChild(selectedView) - 1)));
+                            + storageUriToName(path));
                     desertRef.delete().addOnSuccessListener(aVoid -> {
                                 showToast(WritePostActivity.this, "파일을 삭제하였습니다.");
                                 pathList.remove(parent.indexOfChild(selectedView) - 1);
@@ -283,12 +290,15 @@ public class WritePostActivity extends BasicActivity {
         }
     }
 
-    private void storeUpload(DocumentReference documentReference, PostInfo postInfo) {
+    private void storeUpload(DocumentReference documentReference, final PostInfo postInfo) {
         documentReference.set(postInfo.getPostInfo())
                 .addOnSuccessListener(aVoid -> {
                     Log.d(TAG, "DocumentSnapshot successfully written!");
                     showToast(WritePostActivity.this, "게시글을 등록했습니다.");
                     loaderLayout.setVisibility(View.GONE);
+                    Intent resultIntent = new Intent();
+                    resultIntent.putExtra("postInfo", postInfo);
+                    setResult(Activity.RESULT_OK, resultIntent);
                     finish();
                 })
                 .addOnFailureListener(e -> {
@@ -297,13 +307,13 @@ public class WritePostActivity extends BasicActivity {
                 });
     }
 
-    private void startMyActivity(Class C, String media, int requestCode) {
+    private void startMyActivity(Class C, int media, int requestCode) {
         Intent intent = new Intent(this, C);
         if (C.equals(MainActivity.class)) {
             finishAffinity();
             startActivity(intent);
         } else {
-            intent.putExtra("media", media);
+            intent.putExtra(INTENT_MEDIA, media);
             startActivityForResult(intent, requestCode);
         }
     }

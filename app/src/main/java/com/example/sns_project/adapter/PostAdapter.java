@@ -4,6 +4,7 @@ import static com.example.sns_project.Util.isStorageUri;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
@@ -18,10 +19,13 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.example.sns_project.FirebaseHelper;
 import com.example.sns_project.PostInfo;
 import com.example.sns_project.R;
 import com.example.sns_project.activity.PostActivity;
+import com.example.sns_project.activity.WritePostActivity;
 import com.example.sns_project.listener.OnPostListener;
+import com.example.sns_project.view.ReadContentsView;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,7 +35,8 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     private ArrayList<PostInfo> localDataSet;
     private Activity activity;
-    private OnPostListener onPostListener;
+    private FirebaseHelper firebaseHelper;
+    private final int MORE_INDEX = 2;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         CardView cardView;
@@ -46,10 +51,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     public PostAdapter(Activity activity, ArrayList<PostInfo> dataSet) {
         this.localDataSet = dataSet;
         this.activity = activity;
+        firebaseHelper = new FirebaseHelper(activity);
     }
 
     public void setOnPostListener(OnPostListener onPostListener) {
-        this.onPostListener = onPostListener;
+        firebaseHelper.setOnPostListener(onPostListener);
     }
 
     @Override
@@ -57,11 +63,9 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         return position;
     }
 
-    // Create new views (invoked by the layout manager)
     @Override
     @NonNull
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        // Create a new view, which defines the UI of the list item
         CardView cardView = (CardView) LayoutInflater.from(viewGroup.getContext())
                 .inflate(R.layout.item_post, viewGroup, false);
 
@@ -78,53 +82,26 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         return viewHolder;
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, int position) {
         CardView cardView = viewHolder.cardView;
         TextView titleTextView = cardView.findViewById(R.id.titleTextView);
-        titleTextView.setText(localDataSet.get(position).getTitle());
 
-        TextView createAtTextView = cardView.findViewById(R.id.createAtTextView);
-        createAtTextView.setText(new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                .format(localDataSet.get(position).getCreatedAt()));
+        PostInfo postInfo = localDataSet.get(position);
+        titleTextView.setText(postInfo.getTitle());
 
+        ReadContentsView readContentsView = cardView.findViewById(R.id.readContentsView);
         LinearLayout contentsLayout = cardView.findViewById(R.id.contentsLayout);
-        ViewGroup.LayoutParams layoutParams = new ViewGroup
-                .LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        ArrayList<String> contentsList = localDataSet.get(position).getContents();
 
-        if (contentsLayout.getTag() == null || !contentsLayout.getTag().equals(contentsList)) {
-            contentsLayout.setTag(contentsList);
+        if (contentsLayout.getTag() == null || !contentsLayout.getTag().equals(postInfo)) {
+            contentsLayout.setTag(postInfo);
             contentsLayout.removeAllViews();
-            final int MORE_INDEX = 2;
-            for (int i = 0; i < contentsList.size(); i++) { // 이 조건식은, 스크롤할 때 뷰가 더 추가되지 않게하기 위함
-                if (i == MORE_INDEX) {
-                    TextView textView = new TextView(activity);
-                    textView.setLayoutParams(layoutParams);
-                    textView.setText("더보기...");
-                    contentsLayout.addView(textView);
-                    break;
-                }
-                String contents = contentsList.get(i);
-                if (isStorageUri(contents)) {
-                    ImageView imageView = new ImageView(activity);
-                    imageView.setLayoutParams(layoutParams);
-                    imageView.setAdjustViewBounds(true);
-                    imageView.setScaleType(ImageView.ScaleType.FIT_XY);
-                    contentsLayout.addView(imageView);
-                    Glide.with(activity).load(contents).override(1000).thumbnail(0.1f).into(imageView);
-                } else {
-                    TextView textView = new TextView(activity);
-                    textView.setLayoutParams(layoutParams);
-                    textView.setText(contents);
-                    contentsLayout.addView(textView);
-                }
-            }
+
+            readContentsView.setMoreIndex(MORE_INDEX);
+            readContentsView.setPostInfo(postInfo);
         }
     }
 
-    // Return the size of your dataset (invoked by the layout manager)
     @Override
     public int getItemCount() {
         return localDataSet.size();
@@ -135,18 +112,24 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         popup.setOnMenuItemClickListener(menuItem -> {
             switch (menuItem.getItemId()) {
                 case R.id.modify:
-                    onPostListener.onModify(position);
+                    startMyActivity(WritePostActivity.class, localDataSet.get(position));
                     return true;
                 case R.id.delete:
-                    onPostListener.onDelete(position);
+                    firebaseHelper.storageDelete(localDataSet.get(position));
                     return true;
                 default:
                     return false;
             }
         });
+
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.post, popup.getMenu());
         popup.show();
     }
 
+    private void startMyActivity(Class C, PostInfo postInfo) {
+        Intent intent = new Intent(activity, C);
+        intent.putExtra("postInfo", postInfo);
+        activity.startActivity(intent);
+    }
 }

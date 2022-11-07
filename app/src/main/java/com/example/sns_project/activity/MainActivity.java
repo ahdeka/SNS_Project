@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.sns_project.BackKeyHandler;
+import com.example.sns_project.FirebaseHelper;
 import com.example.sns_project.PostInfo;
 import com.example.sns_project.R;
 import com.example.sns_project.adapter.PostAdapter;
@@ -37,27 +38,21 @@ public class MainActivity extends BasicActivity {
     private static final String TAG = "MainActivity";
     private FirebaseUser firebaseUser;
     private FirebaseFirestore firebaseFirestore;
-    private RecyclerView mRecyclerView;
     private PostAdapter postAdapter;
     private ArrayList<PostInfo> postList;
-    private StorageReference storageRef;
-    private int successCount;
     private BackKeyHandler backKeyHandler = new BackKeyHandler(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        setToolbarTitle(getResources().getString(R.string.app_name));
 
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        storageRef = storage.getReference();
 
         if (firebaseUser == null) {
             startMyActivity(LoginActivity.class);
-
         } else {
-
             firebaseFirestore = FirebaseFirestore.getInstance();
             DocumentReference documentReference = firebaseFirestore.collection("users").document(firebaseUser.getUid());
             documentReference.get().addOnCompleteListener(task -> {
@@ -76,43 +71,13 @@ public class MainActivity extends BasicActivity {
                     Log.d(TAG, "get failed with ", task.getException());
                 }
             });
-
-//
-//            firebaseFirestore.collection("posts")
-//                    .get()
-//                    .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-//                        @Override
-//                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
-//                            if (task.isSuccessful()) {
-//                                ArrayList<PostInfo> postList = new ArrayList<>();
-//                                for (QueryDocumentSnapshot document : task.getResult()) {
-//                                    Log.d(TAG, document.getId() + " => " + document.getData());
-//                                    postList.add(new PostInfo(
-//                                        document.getData().get("title").toString(),
-//                                        (ArrayList<String>) document.getData().get("contents"),
-//                                        document.getData().get("publisher").toString(),
-//                                        new Date(document.getDate("createdAt").getTime()),
-//                                        document.getId()));
-//                                }
-//                                RecyclerView mRecyclerView = findViewById(R.id.recyclerMainView);
-//                                mRecyclerView.setHasFixedSize(true);
-//                                mRecyclerView.setLayoutManager(new LinearLayoutManager(MainActivity.this));
-//
-//                                RecyclerView.Adapter mAdapter = new PostAdapter(MainActivity.this, postList);
-//                                mRecyclerView.setAdapter(mAdapter);
-//                            } else {
-//                                Log.d(TAG, "Error getting documents: ", task.getException());
-//                            }
-//                        }
-//                    });
-
         }
 
         postList = new ArrayList<>();
         postAdapter = new PostAdapter(MainActivity.this, postList);
         postAdapter.setOnPostListener(onPostListener);
 
-        mRecyclerView = findViewById(R.id.recyclerMainView);
+        RecyclerView mRecyclerView = findViewById(R.id.recyclerMainView);
         findViewById(R.id.btnWritePost).setOnClickListener(onClickListener);
 
         mRecyclerView.setHasFixedSize(true);
@@ -126,32 +91,6 @@ public class MainActivity extends BasicActivity {
         super.onResume();
         postsUpdate();
     }
-
-    OnPostListener onPostListener = new OnPostListener() {
-        @Override
-        public void onDelete(int position) {
-            final String id = postList.get(position).getId();
-            ArrayList<String> contentsList = postList.get(position).getContents();
-            for (int i = 0; i < contentsList.size(); i++) {
-                String contents = contentsList.get(i);
-                if (isStorageUri(contents)) {
-                    successCount++;
-                    StorageReference desertRef = storageRef.child("posts/" + id + "/" + storageUriToName(contents));
-                    desertRef.delete().addOnSuccessListener(aVoid -> {
-                                successCount--;
-                                storeUploader(id);
-                            })
-                            .addOnFailureListener(exception -> showToast(MainActivity.this, "ERROR"));
-                }
-            }
-            storeUploader(id);
-        }
-
-        @Override
-        public void onModify(int position) {
-            startMyActivity(WritePostActivity.class, postList.get(position));
-        }
-    };
 
     View.OnClickListener onClickListener = view -> {
         switch (view.getId()) {
@@ -167,11 +106,23 @@ public class MainActivity extends BasicActivity {
         }
     };
 
+    OnPostListener onPostListener = new OnPostListener() {
+        @Override
+        public void onDelete() {
+            postsUpdate();
+            Log.e("로그: ", "삭제 성공");
+        }
+
+        @Override
+        public void onModify() {
+            Log.e("로그: ", "수정 성공");
+        }
+    };
+
     private void postsUpdate() {
 
         if (firebaseUser != null) {
             CollectionReference collectionReference = firebaseFirestore.collection("posts");
-
             collectionReference
                     .orderBy("createdAt", Query.Direction.DESCENDING).get()
                     .addOnCompleteListener(task -> {
@@ -192,19 +143,6 @@ public class MainActivity extends BasicActivity {
                         }
                     });
         }
-    }
-
-    private void storeUploader(String id) {
-        if (successCount == 0) {
-            firebaseFirestore.collection("posts").document(id)
-                    .delete()
-                    .addOnSuccessListener(aVoid -> {
-                        showToast(MainActivity.this, "게시글을 삭제하였습니다");
-                        postsUpdate();
-                    })
-                    .addOnFailureListener(e -> showToast(MainActivity.this, "게시글을 삭제하지 못하였습니다"));
-        }
-
     }
 
     private void startMyActivity(Class C) {

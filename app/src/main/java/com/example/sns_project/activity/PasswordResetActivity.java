@@ -23,6 +23,7 @@ public class PasswordResetActivity extends BasicActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_password_reset);
+        setToolbarTitle("비밀번호 재설정");
 
         // Initialize Firebase Auth = 인스턴스 초기화
         mAuth = FirebaseAuth.getInstance();
