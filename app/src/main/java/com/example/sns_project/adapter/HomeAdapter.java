@@ -1,15 +1,11 @@
 package com.example.sns_project.adapter;
 
-import static com.example.sns_project.Util.isStorageUri;
-
 import android.app.Activity;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -18,7 +14,6 @@ import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.example.sns_project.FirebaseHelper;
 import com.example.sns_project.PostInfo;
 import com.example.sns_project.R;
@@ -26,16 +21,16 @@ import com.example.sns_project.activity.PostActivity;
 import com.example.sns_project.activity.WritePostActivity;
 import com.example.sns_project.listener.OnPostListener;
 import com.example.sns_project.view.ReadContentsView;
+import com.google.android.exoplayer2.ExoPlayer;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Locale;
 
-public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
+public class HomeAdapter extends RecyclerView.Adapter<HomeAdapter.ViewHolder> {
 
     private ArrayList<PostInfo> localDataSet;
     private Activity activity;
     private FirebaseHelper firebaseHelper;
+    private ArrayList<ArrayList<ExoPlayer>> ArrayListOfPlayerArrayList = new ArrayList<>();
     private final int MORE_INDEX = 2;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -48,7 +43,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
     }
 
-    public PostAdapter(Activity activity, ArrayList<PostInfo> dataSet) {
+    public HomeAdapter(Activity activity, ArrayList<PostInfo> dataSet) {
         this.localDataSet = dataSet;
         this.activity = activity;
         firebaseHelper = new FirebaseHelper(activity);
@@ -66,8 +61,7 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
     @Override
     @NonNull
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-        CardView cardView = (CardView) LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.item_post, viewGroup, false);
+        CardView cardView = (CardView) LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.item_post, viewGroup, false);
 
         final ViewHolder viewHolder = new ViewHolder(cardView);
 
@@ -99,6 +93,11 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
 
             readContentsView.setMoreIndex(MORE_INDEX);
             readContentsView.setPostInfo(postInfo);
+
+            ArrayList<ExoPlayer> playerArrayList = readContentsView.getPlayerArrayList();
+            if (playerArrayList != null) {
+                ArrayListOfPlayerArrayList.add(playerArrayList);
+            }
         }
     }
 
@@ -125,6 +124,18 @@ public class PostAdapter extends RecyclerView.Adapter<PostAdapter.ViewHolder> {
         MenuInflater inflater = popup.getMenuInflater();
         inflater.inflate(R.menu.post, popup.getMenu());
         popup.show();
+    }
+
+    public void playerStop() {
+        for (int i = 0; i < ArrayListOfPlayerArrayList.size(); i++) {
+            ArrayList<ExoPlayer> playerArrayList = ArrayListOfPlayerArrayList.get(i);
+            for (int ii = 0; ii < playerArrayList.size(); ii++) {
+                ExoPlayer player = playerArrayList.get(ii);
+                if(player.getPlayWhenReady()){
+                    player.setPlayWhenReady(false);
+                }
+            }
+        }
     }
 
     private void startMyActivity(Class C, PostInfo postInfo) {

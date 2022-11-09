@@ -82,7 +82,8 @@ public class LoginActivity extends BasicActivity {
                                 startMyActivity(MainActivity.class);
                             } else {
                                 if (task.getException() != null)
-                                    showToast(LoginActivity.this, task.getException().toString());
+                                    showToast(LoginActivity.this, "이메일 또는 비밀번호를 확인해주세요");
+//                                    showToast(LoginActivity.this, task.getException().toString());
                             }
                         }
                     });

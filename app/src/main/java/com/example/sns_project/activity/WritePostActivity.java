@@ -4,7 +4,9 @@ import static com.example.sns_project.Util.GALLERY_IMAGE;
 import static com.example.sns_project.Util.GALLERY_VIDEO;
 import static com.example.sns_project.Util.INTENT_MEDIA;
 import static com.example.sns_project.Util.INTENT_PATH;
+import static com.example.sns_project.Util.isImageFile;
 import static com.example.sns_project.Util.isStorageUri;
+import static com.example.sns_project.Util.isVideoFile;
 import static com.example.sns_project.Util.showToast;
 import static com.example.sns_project.Util.storageUriToName;
 
@@ -61,7 +63,7 @@ public class WritePostActivity extends BasicActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wirte_post);
         setToolbarTitle("게시글 작성");
-        
+
         loaderLayout = findViewById(R.id.loaderLayout);
         parent = findViewById(R.id.contentsLayout);
         btnBackgroundLayout = findViewById(R.id.btnBackgroundLayout);
@@ -128,9 +130,9 @@ public class WritePostActivity extends BasicActivity {
         switch (requestCode) {
             case 0:
                 if (resultCode == Activity.RESULT_OK) {
-
                     String path = data.getStringExtra(INTENT_PATH);
                     pathList.add(path);
+
                     ContentsItemView contentsItemView = new ContentsItemView(this);
 
                     if (selectedEditText == null) {
@@ -158,6 +160,7 @@ public class WritePostActivity extends BasicActivity {
                     pathList.set(parent.indexOfChild((View) selectedImageView.getParent()) - 1, path);
                     Glide.with(this).load(path).override(1000).into(selectedImageView);
                 }
+                break;
         }
     }
 
@@ -191,16 +194,22 @@ public class WritePostActivity extends BasicActivity {
                 case R.id.delete:
                     final View selectedView = (View) selectedImageView.getParent();
                     String path = pathList.get(parent.indexOfChild(selectedView) - 1);
-                    StorageReference desertRef = storageRef.child("posts/" + postInfo.getId() + "/"
-                            + storageUriToName(path));
-                    desertRef.delete().addOnSuccessListener(aVoid -> {
-                                showToast(WritePostActivity.this, "파일을 삭제하였습니다.");
-                                pathList.remove(parent.indexOfChild(selectedView) - 1);
-                                parent.removeView(selectedView);
-                                btnBackgroundLayout.setVisibility(View.GONE);
-                            })
-                            .addOnFailureListener(exception -> showToast(WritePostActivity.this, "파일을 삭제하는데 실패했습니다."));
+                    if (isStorageUri(path)) {
+                        StorageReference desertRef = storageRef.child("posts/" + postInfo.getId() + "/"
+                                + storageUriToName(path));
+                        desertRef.delete().addOnSuccessListener(aVoid -> {
+                                    showToast(WritePostActivity.this, "파일을 삭제하였습니다.");
+                                    pathList.remove(parent.indexOfChild(selectedView) - 1);
+                                    parent.removeView(selectedView);
+                                    btnBackgroundLayout.setVisibility(View.GONE);
+                                })
+                                .addOnFailureListener(exception -> showToast(WritePostActivity.this, "파일을 삭제하는데 실패했습니다."));
 
+                    } else {
+                        pathList.remove(parent.indexOfChild(selectedView) - 1);
+                        parent.removeView(selectedView);
+                        btnBackgroundLayout.setVisibility(View.GONE);
+                    }
                     break;
             }
         }
@@ -221,6 +230,7 @@ public class WritePostActivity extends BasicActivity {
         if (title.length() > 0) {
             loaderLayout.setVisibility(View.VISIBLE);
             final ArrayList<String> contentsList = new ArrayList<>();
+            final ArrayList<String> formatList = new ArrayList<>();
             user = FirebaseAuth.getInstance().getCurrentUser();
             FirebaseStorage storage = FirebaseStorage.getInstance();
             StorageReference storageRef = storage.getReference();
@@ -241,11 +251,21 @@ public class WritePostActivity extends BasicActivity {
 
                         if (text.length() > 0) {
                             contentsList.add(text);
+                            formatList.add("text");
                         }
                     } else if (!isStorageUri(pathList.get(pathCount))) {
                         String path = pathList.get(pathCount);
                         successCount++;
                         contentsList.add(path);
+
+                        if (isImageFile(path)) {
+                            formatList.add("image");
+                        } else if (isVideoFile(path)) {
+                            formatList.add("video");
+                        } else {
+                            formatList.add("text");
+                        }
+
                         String[] pathArray = path.split("\\.");
                         final StorageReference mountainImagesRef = storageRef.child
                                 ("posts/" + documentReference.getId() + "/" + pathCount + "." + pathArray[pathArray.length - 1]);
@@ -266,8 +286,8 @@ public class WritePostActivity extends BasicActivity {
                                     successCount--;
                                     if (successCount == 0) {
                                         // 완료
-                                        PostInfo postInfo1 = new PostInfo(title, contentsList, user.getUid(), date);
-                                        storeUpload(documentReference, postInfo1);
+                                        PostInfo postInfo = new PostInfo(title, contentsList, formatList, user.getUid(), date);
+                                        storeUpload(documentReference, postInfo);
                                     }
                                 });
                             });
@@ -282,7 +302,7 @@ public class WritePostActivity extends BasicActivity {
 
             }
             if (successCount == 0) {
-                storeUpload(documentReference, new PostInfo(title, contentsList, user.getUid(), date));
+                storeUpload(documentReference, new PostInfo(title, contentsList, formatList, user.getUid(), date));
             }
 
         } else {

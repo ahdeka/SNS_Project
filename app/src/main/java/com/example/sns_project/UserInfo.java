@@ -1,8 +1,6 @@
 package com.example.sns_project;
 
-import android.widget.EditText;
-
-public class MemberInfo {
+public class UserInfo {
 
     private String name;
     private String phone;
@@ -10,7 +8,7 @@ public class MemberInfo {
     private String address;
     private String photoUri;
 
-    public MemberInfo(String name, String phone, String birth, String address, String photoUri){
+    public UserInfo(String name, String phone, String birth, String address, String photoUri){
         this.name = name;
         this.phone = phone;
         this.birth = birth;
@@ -18,7 +16,7 @@ public class MemberInfo {
         this.photoUri = photoUri;
     }
 
-    public MemberInfo(String name, String phone, String birth, String address){
+    public UserInfo(String name, String phone, String birth, String address){
         this.name = name;
         this.phone = phone;
         this.birth = birth;

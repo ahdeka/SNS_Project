@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.exoplayer2.ui.StyledPlayerView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/contentsPlayer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:auto_show="true"
+    app:resize_mode="fixed_width"
+    app:surface_type="surface_view"
+    app:use_controller="true" />

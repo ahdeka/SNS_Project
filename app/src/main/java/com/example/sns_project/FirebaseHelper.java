@@ -40,21 +40,22 @@ public class FirebaseHelper {
                 StorageReference desertRef = storageRef.child("posts/" + id + "/" + storageUriToName(contents));
                 desertRef.delete().addOnSuccessListener(aVoid -> {
                             successCount--;
-                            storeDelete(id);
+                            storeDelete(id, postInfo);
                         })
                         .addOnFailureListener(exception -> showToast(activity, "ERROR"));
             }
         }
-        storeDelete(id);
+        storeDelete(id, postInfo);
     }
 
-    public void storeDelete(String id) {
+    public void storeDelete(final String id, final PostInfo postInfo) {
         FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
         if (successCount == 0) {
             firebaseFirestore.collection("posts").document(id)
                     .delete()
                     .addOnSuccessListener(aVoid -> {
                         showToast(activity, "게시글을 삭제하였습니다");
+                        onPostListener.onDelete(postInfo);
 //                        postsUpdate();
                     })
                     .addOnFailureListener(e -> showToast(activity, "게시글을 삭제하지 못하였습니다"));

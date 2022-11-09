@@ -14,11 +14,10 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import androidx.annotation.Nullable;
-import androidx.cardview.widget.CardView;
 
 import com.bumptech.glide.Glide;
 import com.example.sns_project.BackKeyHandler;
-import com.example.sns_project.MemberInfo;
+import com.example.sns_project.UserInfo;
 import com.example.sns_project.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -36,6 +35,7 @@ public class MemberInitActivity extends BasicActivity {
     private String profilePath;
     private FirebaseUser user;
     private RelativeLayout loaderLayout;
+    private RelativeLayout buttonBackgroundLayout;
     private static final String TAG = "MemberInfoActivity";
     private ImageView profileImageView;
     private BackKeyHandler backKeyHandler = new BackKeyHandler(this);
@@ -43,11 +43,13 @@ public class MemberInitActivity extends BasicActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_member_info);
+        setContentView(R.layout.activity_user_init);
         setToolbarTitle("회원정보");
 
         loaderLayout = findViewById(R.id.loaderLayout);
         profileImageView = findViewById(R.id.ivProfile);
+        buttonBackgroundLayout = findViewById(R.id.buttonBackgroundLayout);
+        buttonBackgroundLayout.setOnClickListener(onClickListener);
         profileImageView.setOnClickListener(onClickListener);
 
         findViewById(R.id.btnConfirm).setOnClickListener(onClickListener);
@@ -61,13 +63,10 @@ public class MemberInitActivity extends BasicActivity {
                 storageUpload();
                 break;
             case R.id.ivProfile:
-                CardView cardView = findViewById(R.id.buttonsCardView);
-                Log.e("로그", "로그: " + cardView.getVisibility());
-                if (cardView.getVisibility() == view.VISIBLE) {
-                    cardView.setVisibility(view.GONE);
-                } else {
-                    cardView.setVisibility(view.VISIBLE);
-                }
+                buttonBackgroundLayout.setVisibility(view.VISIBLE);
+                break;
+            case R.id.buttonBackgroundLayout:
+                buttonBackgroundLayout.setVisibility(view.GONE);
                 break;
             case R.id.picture:
                 startMyActivity(CameraActivity.class);
@@ -94,7 +93,7 @@ public class MemberInitActivity extends BasicActivity {
             final StorageReference mountainImagesRef = storageRef.child("users/" + user.getUid() + "/profileImages.jpg");
 
             if (profilePath == null) {
-                MemberInfo memberInfo = new MemberInfo(name, birth, phone, address);
+                UserInfo memberInfo = new UserInfo(name, birth, phone, address);
                 storeUploader(memberInfo);
             } else {
                 try {
@@ -109,7 +108,7 @@ public class MemberInitActivity extends BasicActivity {
                     }).addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
                             Uri downloadUri = task.getResult();
-                            MemberInfo memberInfo = new MemberInfo(name, birth, phone, address, downloadUri.toString());
+                            UserInfo memberInfo = new UserInfo(name, birth, phone, address, downloadUri.toString());
                             storeUploader(memberInfo);
 
                             Log.e("성공", "성공: " + downloadUri);
@@ -130,7 +129,7 @@ public class MemberInitActivity extends BasicActivity {
 
     }
 
-    private void storeUploader(MemberInfo memberInfo) {
+    private void storeUploader(UserInfo memberInfo) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("users").document(user.getUid()).set(memberInfo)
                 .addOnSuccessListener(aVoid -> {
@@ -154,6 +153,7 @@ public class MemberInitActivity extends BasicActivity {
                     profilePath = data.getStringExtra(INTENT_PATH);
                     Log.e("로그: ", "profilePath: " + profilePath);
                     Glide.with(this).load(profilePath).centerCrop().override(500).into(profileImageView);
+                    buttonBackgroundLayout.setVisibility(View.GONE);
                 }
                 break;
         }
